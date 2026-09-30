@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | TechMarket</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="main-wrapper" style="max-width: 1200px; margin: 30px auto;">
+        <header class="top-header" style="margin-bottom: 24px;">
+            <div class="header-title">
+                <h1>🛒 Shopping Cart</h1>
+                <p>Review items in your cart before moving forward to secure checkout</p>
+            </div>
+            <div class="header-actions">
+                <a href="/products" class="btn btn-secondary">
+                    ← Continue Shopping
+                </a>
+            </div>
+        </header>
+
+        {% if cart and cart|length > 0 %}
+            <div class="cart-layout">
+                <!-- Cart Items List -->
+                <div class="cart-items-list">
+                    {% for item in cart %}
+                        {% set item_total = item.price * item.quantity %}
+                        <div class="cart-item-card">
+                            <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}" class="cart-item-img">
+                            
+                            <div class="cart-item-details">
+                                <h2 class="cart-item-title">{{ item.name }}</h2>
+                                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">
+                                    {{ item.about if item.about else 'Premium verified electronics & appliances' }}
+                                </p>
+                                <div class="cart-item-price">
+                                    ₹{{ "{:,}".format(item.price) }} <span style="font-size: 12px; color: var(--text-dim); font-weight: normal;">each</span>
+                                </div>
+                            </div>
+
+                            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
+                                <div class="qty-controls">
+                                    <a href="/decrease/{{ item.name }}" class="qty-btn" title="Decrease Quantity">−</a>
+                                    <span class="qty-val">{{ item.quantity }}</span>
+                                    <a href="/increase/{{ item.name }}" class="qty-btn" title="Increase Quantity">+</a>
+                                </div>
+                                <div style="font-weight: 800; font-size: 16px; color: #38bdf8;">
+                                    ₹{{ "{:,}".format(item_total) }}
+                                </div>
+                                <a href="/remove_from_cart/{{ item.name }}" style="color: #fb7185; font-size: 12px; text-decoration: none; font-weight: 600;">
+                                    🗑️ Remove
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Order Summary Sidebar -->
+                <aside class="order-summary">
+                    <h2 style="font-size: 20px; font-weight: 800; border-bottom: 1px solid var(--border-glass); padding-bottom: 14px;">Order Summary</h2>
+                    
+                    <div class="summary-row">
+                        <span>Items Subtotal</span>
+                        <span>₹{{ "{:,}".format(subtotal) }}</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Estimated Shipping</span>
+                        {% if shipping == 0 %}
+                            <span style="color: #34d399; font-weight: 700;">FREE</span>
+                        {% else %}
+                            <span>₹{{ shipping }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if shipping > 0 %}
+                    <div style="font-size: 12px; color: #a5b4fc; background: rgba(99,102,241,0.10); padding: 8px 12px; border-radius: var(--r-sm); border: 1px solid rgba(99,102,241,0.20);">
+                        💡 Add items worth ₹{{ "{:,}".format(5000 - subtotal) }} more for <strong>FREE Shipping</strong>!
+                    </div>
+                    {% endif %}
+
+                    <div class="summary-row" style="color: #34d399; font-weight: 600;">
+                        <span>Promotional Discount</span>
+                        <span>-₹0</span>
+                    </div>
+
+                    <div class="summary-row summary-total">
+                        <span>Grand Total</span>
+                        <span style="color: #38bdf8; font-size: 24px;">₹{{ "{:,}".format(total) }}</span>
+                    </div>
+
+                    <a href="/checkout" class="btn btn-primary btn-full btn-lg" style="margin-top: 10px;">
+                        Proceed to Checkout →
+                    </a>
+
+                    <div style="font-size: 12px; color: var(--text-dim); text-align: center; margin-top: 6px;">
+                        🔒 256-Bit SSL Encrypted Checkout
+                    </div>
+                </aside>
+            </div>
+
+        {% else %}
+            <div class="empty-state">
+                <div style="font-size: 60px; margin-bottom: 16px;">🛒</div>
+                <h3>Your Shopping Cart is Empty</h3>
+                <p style="margin-bottom: 24px; color: var(--text-muted);">Explore our curated collection of smart electronics and home appliances.</p>
+                <a href="/products" class="btn btn-primary btn-lg">
+                    <span>🛍️</span> Browse Product Catalog
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

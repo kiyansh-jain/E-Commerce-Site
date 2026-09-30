@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Payment Method | TechMarket Checkout</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="main-wrapper" style="max-width: 900px; margin: 40px auto;">
+        <header class="top-header" style="margin-bottom: 30px;">
+            <div class="header-title">
+                <h1>💳 Secure Payment Options</h1>
+                <p>Select your preferred payment gateway to complete your order</p>
+            </div>
+            <div class="header-actions">
+                <a href="/cart" class="btn btn-secondary">
+                    ← Back to Cart
+                </a>
+            </div>
+        </header>
+
+        <!-- Order Total Preview Bar -->
+        <div style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.30); border-radius: var(--r-md); padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+            <div>
+                <span style="font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.8px;">Total Payable Amount:</span>
+                <div style="font-size: 26px; font-weight: 900; color: #38bdf8; margin-top: 2px;">
+                    ₹{{ "{:,}".format(total) }}
+                </div>
+            </div>
+            <div style="text-align: right; font-size: 13px; color: #34d399; font-weight: 700;">
+                ✓ 100% Buyer Protection & Encrypted Transfer
+            </div>
+        </div>
+
+        <div class="payment-grid">
+            <a href="/card" class="payment-card-option">
+                <div class="payment-icon">💳</div>
+                <h3>Credit / Debit Card</h3>
+                <p style="font-size: 13px; color: var(--text-muted);">Visa, MasterCard, RuPay, Maestro</p>
+                <span class="badge-tag" style="margin-top: auto;">Instant Processing</span>
+            </a>
+
+            <a href="/upi" class="payment-card-option">
+                <div class="payment-icon">📲</div>
+                <h3>UPI & Instant VPA</h3>
+                <p style="font-size: 13px; color: var(--text-muted);">Google Pay, PhonePe, Paytm, BHIM</p>
+                <span class="badge-tag" style="margin-top: auto; background: rgba(16,185,129,0.18); border-color: rgba(16,185,129,0.35); color: #34d399;">Zero Fee</span>
+            </a>
+
+            <a href="/netbanking" class="payment-card-option">
+                <div class="payment-icon">🏦</div>
+                <h3>Net Banking</h3>
+                <p style="font-size: 13px; color: var(--text-muted);">SBI, HDFC, ICICI, Axis & 50+ Banks</p>
+                <span class="badge-tag" style="margin-top: auto;">Bank Portal</span>
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/products" style="color: var(--text-muted); text-decoration: none; font-size: 14px;">
+                ← Cancel and return to store
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Appliances | TechMarket</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <a href="/" class="sidebar-brand">
+                <span>⚡</span> TechMarket
+            </a>
+
+            <div class="sidebar-title">Categories</div>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="/products" class="sidebar-link">
+                        <span>📱</span> Electronics
+                    </a>
+                </li>
+                <li>
+                    <a href="/home-appliances" class="sidebar-link">
+                        <span>🏠</span> Home Appliances
+                    </a>
+                </li>
+                <li>
+                    <a href="/kitchen" class="sidebar-link active">
+                        <span>🍳</span> Kitchen Appliances
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-title" style="margin-top: 28px;">Account</div>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="/cart" class="sidebar-link">
+                        <span>🛒</span> My Cart
+                        {% if cart_count > 0 %}
+                            <span class="cart-badge">{{ cart_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li>
+                    <a href="/logout" class="sidebar-link" style="color: #fb7185;">
+                        <span>🚪</span> Logout
+                    </a>
+                </li>
+            </ul>
+
+            {% if current_user %}
+            <div style="margin-top: auto; padding: 14px; background: rgba(255,255,255,0.03); border-radius: var(--r-md); border: 1px solid var(--border-glass);">
+                <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;">Signed in as</div>
+                <div style="font-size: 14px; font-weight: 700; color: #38bdf8; margin-top: 2px;">👤 {{ current_user }}</div>
+            </div>
+            {% endif %}
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-wrapper">
+            <header class="top-header">
+                <div class="header-title">
+                    <h1>Kitchen & Culinary Appliances</h1>
+                    <p>Precision cookware, air fryers, convection ovens, and kitchen essentials</p>
+                </div>
+                <div class="header-actions">
+                    <a href="/cart" class="btn btn-secondary">
+                        <span>🛒</span> Cart
+                        {% if cart_count > 0 %}
+                            <span class="cart-badge">{{ cart_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </header>
+
+            <!-- Products Grid -->
+            <section class="products-grid">
+                {% for prod in products %}
+                <div class="product-card">
+                    <div>
+                        <div class="product-meta">
+                            <span class="badge-tag">{{ prod.badge }}</span>
+                            <span class="rating-tag">★ {{ prod.rating }} <span style="color: var(--text-dim); font-size: 11px;">({{ prod.reviews_count }})</span></span>
+                        </div>
+
+                        <div class="product-image-wrap">
+                            <img src="{{ url_for('static', filename=prod.image) }}" alt="{{ prod.name }}" loading="lazy">
+                        </div>
+
+                        <div class="product-info">
+                            <h2 class="product-title">{{ prod.name }}</h2>
+                            <p class="product-desc">{{ prod.short_desc }}</p>
+                            <div class="product-price">{{ prod.formatted_price }}</div>
+                        </div>
+                    </div>
+
+                    <div class="product-actions">
+                        <form action="/add_to_cart" method="POST">
+                            <input type="hidden" name="product_name" value="{{ prod.name }}">
+                            <input type="hidden" name="price" value="{{ prod.price }}">
+                            <input type="hidden" name="image" value="{{ prod.image }}">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                🛒 Add to Cart
+                            </button>
+                        </form>
+                        <a href="/details/{{ prod.slug }}" class="btn btn-secondary btn-sm" title="View Detailed Specs">
+                            🔍 Details
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+
+            <!-- Bottom Features -->
+            <div class="features-bar">
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon-box">🚚</div>
+                        <div>
+                            <div class="feature-title">Free Express Shipping</div>
+                            <div class="feature-desc">On orders over ₹5,000</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon-box">🛡️</div>
+                        <div>
+                            <div class="feature-title">Food-Grade Safe</div>
+                            <div class="feature-desc">100% BPA-Free & Certified</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon-box">⚡</div>
+                        <div>
+                            <div class="feature-title">Energy Efficient</div>
+                            <div class="feature-desc">Low electricity consumption</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon-box">🎧</div>
+                        <div>
+                            <div class="feature-title">Recipe Support</div>
+                            <div class="feature-desc">24/7 Culinary assistance</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel | User Management</title>
+  <link rel="stylesheet" href="/static/main.css" />
+  <style>
+    /* ── Admin-specific overrides ─────────────────────────── */
+    body {
+      background-image:
+        radial-gradient(at 0% 0%,   rgba(245,158,11,0.10) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(239,68,68,0.10) 0px, transparent 50%);
+    }
+
+    /* Header */
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(245,158,11,0.2);
+      padding: 18px 32px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 24px rgba(245,158,11,0.08);
+      margin-bottom: 30px;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .admin-logo {
+      width: 46px;
+      height: 46px;
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 16px rgba(245,158,11,0.4);
+    }
+
+    .admin-title-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .admin-title-text p {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* Stats cards */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .stat-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .stat-icon.users  { background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%); box-shadow: 0 0 16px rgba(59,130,246,0.3); }
+    .stat-icon.active { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 0 16px rgba(16,185,129,0.3); }
+    .stat-icon.admin  { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); box-shadow: 0 0 16px rgba(245,158,11,0.3); }
+
+    .stat-info .val {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .stat-info .lbl {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Users table container */
+    .table-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .table-header {
+      padding: 22px 28px;
+      border-bottom: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .table-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Search bar */
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-input {
+      background: rgba(15,23,42,0.6);
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+      padding: 10px 16px 10px 40px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-family: var(--font-main);
+      outline: none;
+      transition: all 0.25s ease;
+      width: 220px;
+    }
+
+    .search-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+      width: 260px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: rgba(15,23,42,0.5);
+      padding: 14px 24px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      text-align: left;
+    }
+
+    tbody tr {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(255,255,255,0.04);
+    }
+
+    tbody td {
+      padding: 16px 24px;
+      font-size: 15px;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    /* Avatar */
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-right: 12px;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-active {
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.3);
+      color: #34d399;
+    }
+
+    /* Block button */
+    .btn-block {
+      background: rgba(244,63,94,0.12);
+      border: 1px solid rgba(244,63,94,0.3);
+      color: #fb7185;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: var(--font-main);
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .btn-block:hover {
+      background: rgba(244,63,94,0.25);
+      border-color: rgba(244,63,94,0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 0 14px rgba(244,63,94,0.3);
+    }
+
+    /* Empty state */
+    .empty-users {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-users .empty-icon {
+      font-size: 52px;
+      margin-bottom: 14px;
+    }
+
+    .empty-users h3 {
+      font-size: 20px;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    /* Confirm dialog overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .confirm-dialog {
+      background: #1e293b;
+      border: 1px solid rgba(244,63,94,0.3);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(244,63,94,0.1);
+      animation: pop-in 0.2s ease;
+    }
+
+    @keyframes pop-in {
+      from { transform: scale(0.88); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .confirm-dialog .warn-icon {
+      font-size: 50px;
+      margin-bottom: 14px;
+    }
+
+    .confirm-dialog h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .confirm-dialog p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .confirm-dialog .confirm-name {
+      color: #fb7185;
+      font-weight: 700;
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+    }
+
+    .btn-cancel-dialog {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 11px 24px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: var(--font-main);
+      transition: all 0.2s ease;
+    }
+
+    .btn-cancel-dialog:hover {
+      background: rgba(255,255,255,0.14);
+    }
+
+    .btn-confirm-block {
+      background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%);
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 11px 24px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: var(--font-main);
+      transition: all 0.2s ease;
+    }
+
+    .btn-confirm-block:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 0 18px rgba(244,63,94,0.45);
+    }
+
+    /* Row number */
+    .row-num {
+      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Logout btn */
+    .btn-logout-admin {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: var(--font-main);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-logout-admin:hover {
+      background: rgba(255,255,255,0.12);
+      color: var(--text-main);
+    }
+
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Confirm Dialog -->
+  <div class="overlay" id="confirm-overlay">
+    <div class="confirm-dialog">
+      <div class="warn-icon">🚫</div>
+      <h3>Block this User?</h3>
+      <p>You are about to permanently delete <span class="confirm-name" id="dialog-username"></span> from the system. This cannot be undone.</p>
+      <div class="dialog-actions">
+        <button class="btn-cancel-dialog" onclick="closeDialog()">Cancel</button>
+        <form id="block-form" method="POST">
+          <button type="submit" class="btn-confirm-block">Yes, Block User</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- Header -->
+    <div class="admin-header">
+      <div class="admin-brand">
+        <div class="admin-logo">🛡️</div>
+        <div class="admin-title-text">
+          <h1>Admin Control Panel</h1>
+          <p>Manage registered users and access</p>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <a href="/" class="btn-logout-admin">🏪 Store</a>
+        <a href="/admin/logout" class="btn-logout-admin">🚪 Logout</a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon users">👥</div>
+        <div class="stat-info">
+          <div class="val" id="total-count">{{ total }}</div>
+          <div class="lbl">Active Users</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:linear-gradient(135deg,#f43f5e,#ec4899);box-shadow:0 0 16px rgba(244,63,94,0.3);">🚫</div>
+        <div class="stat-info">
+          <div class="val">{{ banned_list | length }}</div>
+          <div class="lbl">Banned Accounts</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon admin">🛡️</div>
+        <div class="stat-info">
+          <div class="val">1</div>
+          <div class="lbl">Admin Accounts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <h2>Registered Users</h2>
+          <p>{{ total }} account{{ 's' if total != 1 else '' }} found</p>
+        </div>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input
+            id="search-box"
+            class="search-input"
+            type="text"
+            placeholder="Search username…"
+            oninput="filterTable(this.value)"
+          />
+        </div>
+      </div>
+
+      {% if user_list %}
+      <table id="users-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Status</th>
+            <th style="text-align:right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in user_list %}
+          <tr class="user-row" data-user="{{ user | lower }}">
+            <td class="row-num">{{ loop.index }}</td>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">{{ user[0] | upper }}</div>
+                <span style="font-weight:600;">{{ user }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-active">● Active</span>
+            </td>
+            <td style="text-align:right;">
+              <button
+                class="btn-block"
+                onclick="openDialog('{{ user }}')"
+              >
+                🚫 Block & Delete
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-users">
+        <div class="empty-icon">👤</div>
+        <h3>No Users Yet</h3>
+        <p>No users have registered on the platform.</p>
+      </div>
+      {% endif %}
+    </div><!-- /active users table -->
+
+    <!-- Banned Users Table -->
+    {% if banned_list %}
+    <div class="table-card" style="margin-top:28px; border-color:rgba(244,63,94,0.25);">
+      <div class="table-header" style="border-bottom-color:rgba(244,63,94,0.15);">
+        <div>
+          <h2 style="color:#fb7185;">🚫 Banned Users</h2>
+          <p>{{ banned_list | length }} account{{ 's' if banned_list | length != 1 else '' }} suspended</p>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Banned</th>
+            <th style="text-align:right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in banned_list %}
+          <tr style="background:rgba(244,63,94,0.03);">
+            <td class="row-num">{{ loop.index }}</td>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar" style="background:linear-gradient(135deg,#f43f5e,#ec4899);">{{ item.username[0] | upper }}</div>
+                <span style="font-weight:600; color:#fb7185;">{{ item.username }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3);color:#fb7185;">
+                🕐 {{ item.time_ago }}
+              </span>
+            </td>
+            <td style="text-align:right;">
+              <form method="POST" action="/admin/unblock/{{ item.username }}" style="display:inline;">
+                <button type="submit" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--text-muted);font-size:13px;font-weight:600;padding:8px 16px;border-radius:var(--radius-md);cursor:pointer;font-family:var(--font-main);transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                  🗑️ Remove Record
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+  </div><!-- /page-wrap -->
+
+  <script>
+    function openDialog(username) {
+      document.getElementById('dialog-username').textContent = '"' + username + '"';
+      document.getElementById('block-form').action = '/admin/block/' + encodeURIComponent(username);
+      document.getElementById('confirm-overlay').classList.add('show');
+    }
+
+    function closeDialog() {
+      document.getElementById('confirm-overlay').classList.remove('show');
+    }
+
+    // Close overlay on outside click
+    document.getElementById('confirm-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeDialog();
+    });
+
+    // Live search
+    function filterTable(query) {
+      const rows = document.querySelectorAll('.user-row');
+      const q = query.toLowerCase().trim();
+      let visible = 0;
+      rows.forEach(function(row) {
+        const name = row.getAttribute('data-user') || '';
+        if (name.includes(q)) {
+          row.style.display = '';
+          visible++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      document.getElementById('total-count').textContent = visible;
+    }
+  </script>
+
+</body>
+</html>

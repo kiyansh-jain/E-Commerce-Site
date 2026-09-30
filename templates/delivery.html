@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | TechMarket</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="confirm-box" style="max-width: 720px;">
+        <div class="confirm-icon">🎉</div>
+        <div class="cat-badge cat-green" style="margin-bottom: 14px;">Payment Authorized & Verified</div>
+        
+        <h1 style="font-size: 32px; font-weight: 800; color: #34d399; margin-bottom: 8px;">
+            Order Placed Successfully!
+        </h1>
+        
+        <p style="font-size: 15px; color: var(--text-muted); margin-bottom: 24px;">
+            Thank you for your order, <strong>{{ current_user or 'valued customer' }}</strong>! Your package is being prepared for dispatch.
+        </p>
+
+        <!-- Tracking & Status Badge -->
+        <div style="background: rgba(6, 12, 28, 0.75); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: var(--r-md); padding: 20px 24px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; text-align: left; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 700;">
+                    Order Reference ID
+                </span>
+                <div style="font-size: 22px; font-weight: 900; color: #38bdf8; font-family: monospace;">
+                    {{ order_id }}
+                </div>
+            </div>
+            <div>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 700;">
+                    Estimated Delivery
+                </span>
+                <div style="font-size: 18px; font-weight: 800; color: #34d399;">
+                    2 – 4 Business Days
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt / Ordered Items Breakdown -->
+        {% if items %}
+        <div class="receipt-box">
+            <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 14px; color: var(--text-main); border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                Ordered Items Summary
+            </h3>
+            {% for it in items %}
+            <div class="receipt-row">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="{{ url_for('static', filename=it.image) }}" alt="{{ it.name }}" style="width: 36px; height: 36px; object-fit: contain; border-radius: 6px; background: rgba(0,0,0,0.4); padding: 4px;">
+                    <div>
+                        <div style="font-weight: 700; color: var(--text-main);">{{ it.name }}</div>
+                        <div style="font-size: 12px; color: var(--text-dim);">Qty: {{ it.quantity }} × ₹{{ "{:,}".format(it.price) }}</div>
+                    </div>
+                </div>
+                <div style="font-weight: 800; color: #38bdf8;">
+                    ₹{{ "{:,}".format(it.price * it.quantity) }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="receipt-row" style="margin-top: 8px; font-weight: 800; font-size: 16px; border-top: 1px solid rgba(99,102,241,0.30); padding-top: 12px;">
+                <span>Total Amount Paid</span>
+                <span style="color: #34d399; font-size: 18px;">₹{{ "{:,}".format(total) }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a href="/products" class="btn btn-primary btn-lg">
+                🛍️ Continue Shopping
+            </a>
+            <a href="/" class="btn btn-secondary btn-lg">
+                🏠 Back to Home
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

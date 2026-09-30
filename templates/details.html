@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ item.name }} | TechMarket Specifications</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="details-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <a href="{{ item.category_url or '/products' }}" class="btn btn-secondary btn-sm">
+                ← Back to {{ item.category or 'Catalog' }}
+            </a>
+            <a href="/cart" class="btn btn-secondary btn-sm">
+                <span>🛒</span> View Cart {% if cart_count > 0 %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+            </a>
+        </div>
+
+        <div class="details-card">
+            <div class="details-image-box">
+                <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}" id="mainProductImage">
+            </div>
+
+            <div class="details-content">
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
+                    <span class="details-spec-badge">{{ item.badge or 'Premium' }}</span>
+                    <span class="rating-tag">★ {{ item.rating or '4.8' }} <span style="color: var(--text-dim); font-size: 12px;">({{ item.reviews_count or '150' }} verified reviews)</span></span>
+                </div>
+
+                <h2>{{ item.name }}</h2>
+                <div style="font-size: 13px; color: #06b6d4; font-weight: 700; margin-bottom: 14px;">
+                    Category: {{ item.category or 'Electronics' }} &nbsp;•&nbsp; <span style="color: #34d399;">✓ In Stock & Ready to Ship</span>
+                </div>
+                
+                <p class="details-about">
+                    {{ item.about }}
+                </p>
+
+                <!-- Technical Highlights -->
+                {% if item.specs %}
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px;">
+                        Key Specifications
+                    </div>
+                    <div class="spec-list">
+                        {% for spec in item.specs %}
+                        <div class="spec-item">
+                            <span class="spec-bullet">⚡</span>
+                            <span>{{ spec }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="details-price">
+                    {{ item.formatted_price or '₹' ~ item.price }}
+                    <span style="font-size: 14px; font-weight: normal; color: var(--text-muted); margin-left: 6px;">(Inclusive of all taxes)</span>
+                </div>
+
+                <div style="display: flex; gap: 14px;">
+                    <form action="/add_to_cart" method="POST" style="flex: 1;">
+                        <input type="hidden" name="product_name" value="{{ item.name }}">
+                        <input type="hidden" name="price" value="{{ item.price }}">
+                        <input type="hidden" name="image" value="{{ item.image }}">
+                        <input type="hidden" name="about" value="{{ item.short_desc }}">
+                        <button type="submit" class="btn btn-primary btn-full btn-lg">
+                            🛒 Add to Cart
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommended Related Products -->
+        {% if recommendations %}
+        <div style="margin-top: 50px;">
+            <div style="margin-bottom: 20px;">
+                <span class="cat-badge cat-pink">Explore More</span>
+                <h3 class="section-heading" style="margin-top: 6px; font-size: 22px;">You May Also Like</h3>
+            </div>
+
+            <div class="products-grid">
+                {% for rec in recommendations %}
+                <div class="product-card">
+                    <div>
+                        <div class="product-meta">
+                            <span class="badge-tag">{{ rec.badge }}</span>
+                            <span class="rating-tag">★ {{ rec.rating }}</span>
+                        </div>
+                        <div class="product-image-wrap">
+                            <img src="{{ url_for('static', filename=rec.image) }}" alt="{{ rec.name }}" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h4 class="product-title">{{ rec.name }}</h4>
+                            <div class="product-price">{{ rec.formatted_price }}</div>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <form action="/add_to_cart" method="POST">
+                            <input type="hidden" name="product_name" value="{{ rec.name }}">
+                            <input type="hidden" name="price" value="{{ rec.price }}">
+                            <input type="hidden" name="image" value="{{ rec.image }}">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                🛒 Add
+                            </button>
+                        </form>
+                        <a href="/details/{{ rec.slug }}" class="btn btn-secondary btn-sm">
+                            🔍 Specs
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

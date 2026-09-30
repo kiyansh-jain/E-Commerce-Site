@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechMarket | Premium Electronics & Smart Living</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="hero-wrapper">
+        <div class="hero-card">
+            <div class="cat-badge cat-blue" style="margin-bottom: 18px;">
+                ⚡ Next-Gen E-Commerce Experience
+            </div>
+
+            <h1 class="hero-title">
+                Welcome to TechMarket
+            </h1>
+
+            <p class="hero-subtitle">
+                Discover state-of-the-art electronics, smart home automation, and precision kitchen appliances engineered for modern living.
+            </p>
+
+            <div class="hero-btns">
+                {% if current_user %}
+                    <a href="/products" class="btn btn-primary btn-lg">
+                        <span>🏬</span> Explore Catalog
+                    </a>
+                    <a href="/cart" class="btn btn-secondary btn-lg">
+                        <span>🛒</span> View Cart {% if cart_count > 0 %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+                    </a>
+                {% else %}
+                    <a href="/login" class="btn btn-primary btn-lg">
+                        <span>🔑</span> Sign In
+                    </a>
+                    <a href="/register" class="btn btn-secondary btn-lg">
+                        <span>✨</span> Create Account
+                    </a>
+                    <a href="/products" class="btn btn-secondary btn-lg">
+                        <span>🏬</span> Browse Store
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Featured Highlights Section -->
+        <div style="max-width: 1200px; width: 100%; margin-top: 50px;">
+            <div style="text-align: center; margin-bottom: 28px;">
+                <span class="cat-badge cat-cyan">Trending Deals</span>
+                <h2 class="section-heading" style="margin-top: 8px;">Featured Products</h2>
+                <p class="section-sub">Hand-picked bestsellers ready for immediate dispatch</p>
+            </div>
+
+            <div class="products-grid">
+                {% for prod in featured_products %}
+                <div class="product-card">
+                    <div>
+                        <div class="product-meta">
+                            <span class="badge-tag">{{ prod.badge }}</span>
+                            <span class="rating-tag">★ {{ prod.rating }}</span>
+                        </div>
+                        <div class="product-image-wrap">
+                            <img src="{{ url_for('static', filename=prod.image) }}" alt="{{ prod.name }}" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">{{ prod.name }}</h3>
+                            <p class="product-desc">{{ prod.short_desc }}</p>
+                            <div class="product-price">{{ prod.formatted_price }}</div>
+                        </div>
+                    </div>
+
+                    <div class="product-actions">
+                        <form action="/add_to_cart" method="POST">
+                            <input type="hidden" name="product_name" value="{{ prod.name }}">
+                            <input type="hidden" name="price" value="{{ prod.price }}">
+                            <input type="hidden" name="image" value="{{ prod.image }}">
+                            <button type="submit" class="btn btn-primary btn-full">
+                                🛒 Add to Cart
+                            </button>
+                        </form>
+                        <a href="/details/{{ prod.slug }}" class="btn btn-secondary btn-sm" title="View Specifications">
+                            🔍 Details
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Features Bar -->
+            <div class="features-bar" style="margin-top: 45px;">
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon-box">🚚</div>
+                        <div>
+                            <div class="feature-title">Free Express Delivery</div>
+                            <div class="feature-desc">On all orders above ₹5,000</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon-box">🛡️</div>
+                        <div>
+                            <div class="feature-title">100% Secure Payment</div>
+                            <div class="feature-desc">End-to-end encrypted checkout</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon-box">↩️</div>
+                        <div>
+                            <div class="feature-title">7-Day Easy Returns</div>
+                            <div class="feature-desc">Hassle-free replacement policy</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon-box">🎧</div>
+                        <div>
+                            <div class="feature-title">24/7 Dedicated Support</div>
+                            <div class="feature-desc">Expert assistance anytime</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Links -->
+            <div style="text-align: center; margin-top: 40px; font-size: 13px; color: var(--text-dim);">
+                <p>© {{ now.year }} TechMarket. All rights reserved. &nbsp;|&nbsp; <a href="/admin" style="color: var(--text-muted); text-decoration: none;">Admin Access</a></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

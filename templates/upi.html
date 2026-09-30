@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Instant Payment | TechMarket</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="auth-card" style="max-width: 480px;">
+            <div class="auth-header">
+                <span class="auth-icon">📲</span>
+                <h1>UPI Instant Pay</h1>
+                <p>Pay instantly using your VPA / UPI ID</p>
+            </div>
+
+            <!-- Total Amount Pill -->
+            <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.30); border-radius: var(--r-md); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Total Payable:</span>
+                <span style="font-size: 20px; font-weight: 800; color: #34d399;">₹{{ "{:,}".format(total) }}</span>
+            </div>
+
+            <form action="/delivery" method="GET">
+                <div class="form-group">
+                    <label for="upiId">Virtual Payment Address (VPA)</label>
+                    <input type="text" id="upiId" class="form-input" placeholder="username@okhdfcbank / mobile@paytm" required autofocus>
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                    <span class="badge-tag" style="cursor: pointer;" onclick="document.getElementById('upiId').value='alex@okhdfcbank'">@okhdfcbank</span>
+                    <span class="badge-tag" style="cursor: pointer;" onclick="document.getElementById('upiId').value='alex@paytm'">@paytm</span>
+                    <span class="badge-tag" style="cursor: pointer;" onclick="document.getElementById('upiId').value='alex@ybl'">@ybl</span>
+                    <span class="badge-tag" style="cursor: pointer;" onclick="document.getElementById('upiId').value='alex@icici'">@icici</span>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-full btn-lg" style="margin-top: 10px;">
+                    ⚡ Authorize & Pay ₹{{ "{:,}".format(total) }}
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 22px;">
+                <a href="/checkout" style="color: var(--text-muted); text-decoration: none; font-size: 14px;">
+                    ← Choose another payment method
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
